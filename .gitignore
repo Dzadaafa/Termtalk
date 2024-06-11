@@ -1,0 +1,7 @@
+dist/
+build/
+*.egg-info/
+termtalk/__pycache__/
+termtalk/*.json
+setup.py
+incoming_features.txt
