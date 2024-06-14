@@ -2,7 +2,7 @@
 import platform
 import os
 import time
-from . import sender
+import sender
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,14 +19,6 @@ def start_receiver():
     else:  # Assume Unix-like (Linux)
         os.system(f'gnome-terminal -- python3 {receiver_path}')
 
-def user_input():
-    while True:
-        user_text = input("Enter your message (or type 'exit' to quit): ")
-        if user_text.lower() == 'exit':
-            print("Exiting...")
-            open(flag_file, 'a').close()
-            break
-        print(f"You entered: {user_text}")
 
 def start():
     # Remove the flag file if it exists
