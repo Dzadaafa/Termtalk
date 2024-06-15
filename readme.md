@@ -14,12 +14,12 @@ Built fully in Python with Firebase as Database Storage (Temporary).
 Install the package using pip:
 
 ```bash
-pip install tchat
+pip install termtalk
 ```
 ## Usage
 After installed the package, you can just use it in Terminal
 ```
-Tchat
+Termtalk
 ```
 Cause it was a CLI app, you don't need to do anything confusing
 
