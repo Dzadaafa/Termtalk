@@ -2,15 +2,23 @@
 import platform
 import os
 import time
-import sender
+import argparse
+from . import sender, receiver
+# import sender, receiver
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-d", "--destination", help="start the chat page individually", action="store_true")
+parser.add_argument("-s", "--sender", help="start the chat sender individually", action="store_true")
+
+arg = parser.parse_args()
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 flag_file = os.path.join(script_dir, 'exit_flag')
 receiver_path = os.path.join(script_dir, 'receiver.py')
 
-def start_receiver():
-
+def new_page_receiver():
     
     if platform.system() == "Windows":
         os.system(f'start cmd /k python {receiver_path}')
@@ -21,18 +29,20 @@ def start_receiver():
 
 
 def start():
-    # Remove the flag file if it exists
-    if os.path.exists(flag_file):
-        os.remove(flag_file)
+    if arg.destination:
+        if os.path.exists(flag_file):
+            os.remove(flag_file)
+        receiver.receive_message()
 
-    # Start the receiver in a new terminal
-    start_receiver()
+    elif arg.sender:
+        sender.user_input()
 
-    # Give some time for the new terminal to open
-    time.sleep(2)
-
-    # Start the sender in the current terminal
-    sender.user_input()
+    else:
+        if os.path.exists(flag_file):
+            os.remove(flag_file)
+        new_page_receiver()
+        time.sleep(2)
+        sender.user_input()
 
 if __name__ == "__main__":
     start()
