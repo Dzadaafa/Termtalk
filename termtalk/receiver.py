@@ -19,27 +19,12 @@ with open(config_file, 'r') as f:
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
-def rand_color(is_print=False, unless=None, value=None):
-    colors = [Fore.BLACK, Fore.RED, Fore.GREEN, Fore.YELLOW, 
-            Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE, 
+colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, 
+            Fore.BLUE, Fore.MAGENTA, Fore.CYAN, 
             Fore.LIGHTRED_EX, Fore.LIGHTGREEN_EX, 
             Fore.LIGHTYELLOW_EX, Fore.LIGHTBLUE_EX, Fore.LIGHTMAGENTA_EX, 
             Fore.LIGHTCYAN_EX]
-    if unless:
-        if isinstance(unless, list) or isinstance(unless, set):
-            for i in unless:
-                colors.remove(i)
-        else:
-            colors.remove(unless)
 
-    color = random.choice(colors)
-
-    if is_print:
-        if value is None:
-            raise ValueError("Please provide a value when 'is_print' is True")
-        print(f"{color}{value}{Style.RESET_ALL}")
-    else:
-        return color
 
 latest_msg = ""
 
@@ -53,9 +38,10 @@ def receive_message():
         if result:
             messages = list(result['messages'].items())
             last_key, main_val = messages[-1]
+            color = main_val['color']
 
             if last_key != latest_msg:
-                print(f"{rand_color(unless={Fore.BLACK, Fore.WHITE})}{main_val['username']}: {Fore.WHITE}{main_val['message']}")
+                print(f"{colors[color]}{main_val['username']}: {Fore.WHITE}{main_val['message']}")
                 latest_msg = last_key
             else:
                 return

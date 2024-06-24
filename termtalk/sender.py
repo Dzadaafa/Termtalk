@@ -20,10 +20,13 @@ with open(config_file, 'r') as f:
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
+color = random.randint(1, 12)
+
 def user_input():
     username = input(f"{Fore.GREEN}Enter your username:{resetStyle} ")
     print("=" * 50)
     print("Welcome, "+f"{Fore.GREEN}{username}{resetStyle}! You can start typing your messages.")
+
 
     
     while True:
@@ -40,15 +43,11 @@ def user_input():
 
             messages_ref.push({
                 "username": username,
-                "message": user_text
+                "message": user_text,
+                "color": color
             })
         except Exception as e:
             print(f"Error sending message: {e}")
-
-
-def unique_key(length=20):
-    characters = string.ascii_letters + string.digits + '-_'
-    return ''.join(random.choice(characters) for _ in range(length))
 
 if __name__ == "__main__":
     user_input()
