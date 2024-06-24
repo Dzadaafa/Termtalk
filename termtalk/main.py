@@ -3,8 +3,8 @@ import platform
 import os
 import time
 import argparse
-# from . import sender, receiver
-import sender, receiver
+from . import sender, receiver
+# import sender, receiver
 
 parser = argparse.ArgumentParser()
 
