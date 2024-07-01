@@ -1,9 +1,8 @@
 import pyrebase
 import os
 import platform
-from colorama import Fore, Style
+from colorama import Fore
 import json
-import random
 
 # import credential hehe
 script_dir = os.path.dirname(os.path.abspath(__file__))
