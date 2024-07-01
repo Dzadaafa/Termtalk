@@ -38,7 +38,7 @@ def receive_message():
         if result:
             messages = list(result['messages'].items())
             last_key, main_val = messages[-1]
-            color = main_val['color']
+            color = main_val['color'] if 'color' in main_val.keys() else 1
 
             if last_key != latest_msg:
                 print(f"{colors[color]}{main_val['username']}: {Fore.WHITE}{main_val['message']}")
