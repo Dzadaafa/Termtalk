@@ -26,40 +26,31 @@ colors = [Fore.RED, Fore.GREEN, Fore.YELLOW,
 
 
 latest_msg = ""
+messages = []
 
 def receive_message():
     messages_ref = db.child("message")
 
     def message_callback(message):
-        global latest_msg
+        global latest_msg, messages
 
         result = message.val()
         if result:
-            messages = list(result['messages'].items())
-            last_key, main_val = messages[-1]
-            color = main_val['color'] if 'color' in main_val.keys() else 1
+            brutha = list(result['messages'].items())
+            last_key, main_val = brutha[-1]
+            db_color = main_val['color'] if main_val['color'] and 7 >= main_val['color'] >= 0 else 3
 
             if last_key != latest_msg:
-                print(f"{colors[color]}{main_val['username']}: {Fore.WHITE}{main_val['message']}")
+                oklahoma = ((main_val['username'],main_val['message']), db_color)
+                messages.append(oklahoma)
                 latest_msg = last_key
             else:
                 return
 
     while True:
-        if os.path.exists(flag_file):
-            break
-        else:
-            new_message = messages_ref.get()
-            if new_message:
-                message_callback(new_message)
-
-    if platform.system() == "Windows":
-        os.system("taskkill /F /IM cmd.exe")
-    elif platform.system() == "Darwin":  # macOS
-        os.system(
-            "osascript -e 'tell application \"Terminal\" to close first window' & exit")
-    else:  # Unix-like (Linux)
-        os.system("kill -9 $PPID")
+        new_message = messages_ref.get()
+        if new_message:
+            message_callback(new_message)
 
 
 if __name__ == "__main__":
