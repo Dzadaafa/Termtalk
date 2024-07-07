@@ -36,13 +36,13 @@ def receive_message():
 
         result = message.val()
         if result:
-            brutha = list(result['messages'].items())
-            last_key, main_val = brutha[-1]
+            listed_result = list(result['messages'].items())
+            last_key, main_val = listed_result[-1]
             db_color = main_val['color'] if main_val['color'] and 7 >= main_val['color'] >= 0 else 3
 
             if last_key != latest_msg:
-                oklahoma = ((main_val['username'],main_val['message']), db_color)
-                messages.append(oklahoma)
+                final_result = ((main_val['username'],main_val['message']), db_color)
+                messages.append(final_result)
                 latest_msg = last_key
             else:
                 return
@@ -51,6 +51,7 @@ def receive_message():
         new_message = messages_ref.get()
         if new_message:
             message_callback(new_message)
+
 
 
 if __name__ == "__main__":

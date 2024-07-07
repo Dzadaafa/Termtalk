@@ -1,11 +1,10 @@
 import curses
+from curses.textpad import rectangle
 import pyrebase
 import os
-from colorama import Fore, Style
 import json
 import threading
-import random
-import receiver as rcvr
+import receiver as rcvr, login
 
 # Firebase configuration
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,10 +25,6 @@ colors = [
     curses.COLOR_BLUE, curses.COLOR_YELLOW
 ]
 
-username:str
-color:int
-
-
 def main(stdscr):
     global inputUsr, username, colors
 
@@ -47,7 +42,7 @@ def main(stdscr):
     stdscr.clear()
 
     # Get the screen height and width
-    height, width = stdscr.getmaxyx()
+    height, width = map(int, stdscr.getmaxyx())
 
     # List to store the printed numbers
     lines = []
@@ -60,7 +55,7 @@ def main(stdscr):
             new_message = messages.pop(0)
             
             # Check if we have reached the height limit for numbers
-            if len(lines) >= height - 2:
+            if len(lines) >= height - 6:
                 # Remove the oldest number from the top
                 lines.pop(0)
             
@@ -69,20 +64,22 @@ def main(stdscr):
 
         # Clear the screen
         stdscr.clear()
+        try:
+            rectangle(stdscr, 0, 0, height-5, width-2)
+            rectangle(stdscr, height-4, 0, height-1, width-2)
+        except Exception as e:
+            pass
 
-        stdscr.addstr(0, int((width / 2) - len(username)), f"Termtalk", curses.color_pair(4) | curses.A_UNDERLINE )
+        stdscr.addstr(0, 2, f" TERMTALK ", curses.color_pair(4) | curses.A_UNDERLINE )
 
         for idx, line in enumerate(lines):
             msg, usncolor = line
             usn, usnmsg = msg
-            stdscr.addstr(idx + 2, 0, f"{usn}: ", curses.color_pair(usncolor + 1))
+            stdscr.addstr(idx + 1, 2, f"{usn}: ", curses.color_pair(usncolor + 1))
             stdscr.addstr(usnmsg)
 
-        # Print the input prompt at the bottom
-        stdscr.addstr(height - 4, 0, "-" * width)
-        stdscr.addstr(height - 3, 0, "(Esc) Exit", curses.A_DIM)
-        stdscr.addstr(height - 2, 0, "-" * width)
-        stdscr.addstr(height - 1, 0, f"{username}: ", curses.color_pair(color + 1))
+        stdscr.addstr(height - 4, 2, "(Esc) Exit", curses.A_DIM)
+        stdscr.addstr(height - 2, 2, f"{username}: ", curses.color_pair(color + 1))
         stdscr.addstr(str(inputUsr))
 
         # Refresh the screen to see the changes
@@ -95,7 +92,7 @@ def main(stdscr):
         # If the user presses 'ESC', break the loop
         if key == 27:
             break
-        elif key == 8 or key == 127:  # Backspace
+        elif key == 8:  # Backspace
             inputUsr = inputUsr[:-1]
         elif key == 10:  # Enter
             try:
@@ -114,9 +111,6 @@ def main(stdscr):
                 inputUsr = inputUsr + chr(key)
 
 def start():
-    global username, color
-    username = input(f"{Fore.GREEN}Enter your username:{Style.RESET_ALL} ")
-    color = random.randint(2, 7)
     # Run the message receiving function in a separate thread
     receive_thread = threading.Thread(target=rcvr.receive_message, daemon=True)
     receive_thread.start()
@@ -125,4 +119,5 @@ def start():
     curses.wrapper(main)
 
 if __name__ == "__main__":
+    username, color = curses.wrapper(login.main)
     start()
