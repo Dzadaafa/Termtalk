@@ -1,38 +1,16 @@
 import curses
 from curses.textpad import rectangle
-import pyrebase
-import os
-import json
+
 import threading
-import receiver as rcvr, login
+import messagehandler as msgh, login
+# from . import messagehandler as msgh, login
 
-# Firebase configuration
-script_dir = os.path.dirname(os.path.abspath(__file__))
-flag_file = os.path.join(script_dir, 'exit_flag')
-config_file = os.path.join(script_dir, 'config.json')
-
-with open(config_file, 'r') as f:
-    config = json.load(f)
-
-# Initialize Firebase
-firebase = pyrebase.initialize_app(config)
-db = firebase.database()
-
-colors = [
-    curses.COLOR_BLACK, curses.COLOR_WHITE,
-    curses.COLOR_CYAN, curses.COLOR_GREEN,
-    curses.COLOR_MAGENTA, curses.COLOR_RED,
-    curses.COLOR_BLUE, curses.COLOR_YELLOW
-]
+colors = login.colors
 
 def main(stdscr):
     global inputUsr, username, colors
 
     curses.start_color()
-    if not curses.has_colors():
-        stdscr.addstr(0, 0, "Your terminal does not support colors.", curses.A_BOLD)
-        stdscr.refresh()
-        stdscr.getch()
 
     for i, colored in enumerate(colors):
         if 2 <= i <= 7:
@@ -46,10 +24,10 @@ def main(stdscr):
 
     # List to store the printed numbers
     lines = []
-    inputUsr = ""
 
-    while True:
-        messages = rcvr.messages
+    while username: #while username exist
+        messages = msgh.messages
+
         # Check if we have new messages
         while len(messages) > 0:
             new_message = messages.pop(0)
@@ -78,7 +56,7 @@ def main(stdscr):
             stdscr.addstr(idx + 1, 2, f"{usn}: ", curses.color_pair(usncolor + 1))
             stdscr.addstr(usnmsg)
 
-        stdscr.addstr(height - 4, 2, "(Esc) Exit", curses.A_DIM)
+        stdscr.addstr(height - 4, 2, "(Esc) Exit || (Enter) Send", curses.A_DIM)
         stdscr.addstr(height - 2, 2, f"{username}: ", curses.color_pair(color + 1))
         stdscr.addstr(str(inputUsr))
 
@@ -92,32 +70,31 @@ def main(stdscr):
         # If the user presses 'ESC', break the loop
         if key == 27:
             break
+
         elif key == 8:  # Backspace
             inputUsr = inputUsr[:-1]
-        elif key == 10:  # Enter
-            try:
-                messages_ref = db.child("messages")
 
-                messages_ref.push({
-                    "username": username,
-                    "message": inputUsr,
-                    "color": color
-                })
-                inputUsr = ""
-            except Exception as e:
-                pass
+        elif key == 10 and len(inputUsr.strip()) >= 1:  # Enter
+            sndmsg = msgh.send_message(color, username, inputUsr)
+            if sndmsg: inputUsr = ""
+
         else:
-            if 32 <= key <= 126 and len(inputUsr) <= 40:
+            if key in range(31, 127) and len(inputUsr) <= 30:
                 inputUsr = inputUsr + chr(key)
 
 def start():
     # Run the message receiving function in a separate thread
-    receive_thread = threading.Thread(target=rcvr.receive_message, daemon=True)
+    receive_thread = threading.Thread(target=msgh.receive_message, daemon=True)
     receive_thread.start()
 
     # Initialize curses
     curses.wrapper(main)
 
 if __name__ == "__main__":
-    username, color = curses.wrapper(login.main)
+    try:
+        username, color = curses.wrapper(login.main)
+    except Exception as e:
+        exit()
+    inputUsr = ""
     start()
+    

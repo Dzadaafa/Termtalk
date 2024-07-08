@@ -28,10 +28,10 @@ colors = [Fore.RED, Fore.GREEN, Fore.YELLOW,
 latest_msg = ""
 messages = []
 
-def receive_message():
+def receive_message() -> list | None:
     messages_ref = db.child("message")
 
-    def message_callback(message):
+    def message_callback(message) -> list:
         global latest_msg, messages
 
         result = message.val()
@@ -44,15 +44,26 @@ def receive_message():
                 final_result = ((main_val['username'],main_val['message']), db_color)
                 messages.append(final_result)
                 latest_msg = last_key
+                return final_result
             else:
-                return
+                return None
 
     while True:
         new_message = messages_ref.get()
         if new_message:
             message_callback(new_message)
 
+def send_message(color:int, username:str, msg:str) -> bool:
+    try:
+        messages_ref = db.child("messages")
 
+        messages_ref.push({
+            "username": username,
+            "message": msg,
+            "color": color
+        })
 
-if __name__ == "__main__":
-    receive_message()
+        return True
+    except Exception as e:
+        return False
+
