@@ -1,11 +1,20 @@
+import sys
 import curses
 from curses.textpad import rectangle
 
 import threading
-import messagehandler as msgh, login
+import messagehandler as msgh, lio, exitHandler
 # from . import messagehandler as msgh, login
 
-colors = login.colors
+def handling_exit():
+    msgh.status(logout=True)
+    print("\033[31m" + "You're using inappropriate way to exit." + "\033[0m" + "\n")
+    print("Follow me!\033[94m\nGithub: Dzadaafa\nInstagram: Dzadafa\033[0m\nTo get the new update about this project.")
+    sys.exit()
+
+exitHandler.start(handling_exit)
+
+colors = lio.colors
 
 def main(stdscr):
     global inputUsr, username, colors
@@ -21,12 +30,15 @@ def main(stdscr):
 
     # Get the screen height and width
     height, width = map(int, stdscr.getmaxyx())
+    width = width - 2
+    mid_w = int(width/2)
 
     # List to store the printed numbers
     lines = []
 
     while username: #while username exist
         messages = msgh.messages
+        online_user = msgh.online_user
 
         # Check if we have new messages
         while len(messages) > 0:
@@ -42,13 +54,18 @@ def main(stdscr):
 
         # Clear the screen
         stdscr.clear()
+
+        #BoxDraw
         try:
-            rectangle(stdscr, 0, 0, height-5, width-2)
-            rectangle(stdscr, height-4, 0, height-1, width-2)
+            rectangle(stdscr, 0, 0, height-5, width)
+            rectangle(stdscr, height-4, 0, height-1, mid_w-1)
+            rectangle(stdscr, height-4, mid_w+1, height-1, width)
         except Exception as e:
             pass
 
-        stdscr.addstr(0, 2, f" TERMTALK ", curses.color_pair(4) | curses.A_UNDERLINE )
+        #Box 1
+        stdscr.addstr(0, mid_w-5, f" TERMTALK ", curses.color_pair(5) | curses.A_UNDERLINE )
+        
 
         for idx, line in enumerate(lines):
             msg, usncolor = line
@@ -56,8 +73,15 @@ def main(stdscr):
             stdscr.addstr(idx + 1, 2, f"{usn}: ", curses.color_pair(usncolor + 1))
             stdscr.addstr(usnmsg)
 
-        stdscr.addstr(height - 4, 2, "(Esc) Exit || (Enter) Send", curses.A_DIM)
-        stdscr.addstr(height - 2, 2, f"{username}: ", curses.color_pair(color + 1))
+        #Box3
+        stdscr.addstr(height - 4, mid_w + 3, " Key Binding ", curses.color_pair(8))
+        stdscr.addstr(height - 2, mid_w + 3, " (Esc) Exit", curses.color_pair(7))
+        stdscr.addstr(" | ")
+        stdscr.addstr("(Enter) Send ", curses.color_pair(7))
+
+        #Box2
+        stdscr.addstr(height - 4, 2, f" Active user: {online_user} ", curses.color_pair(4))
+        stdscr.addstr(height - 2, 2, f"-> {username}: ", curses.color_pair(color + 1))
         stdscr.addstr(str(inputUsr))
 
         # Refresh the screen to see the changes
@@ -69,6 +93,8 @@ def main(stdscr):
 
         # If the user presses 'ESC', break the loop
         if key == 27:
+            msgh.status(logout=True)
+            lio.logout_screen(stdscr)
             break
 
         elif key == 8:  # Backspace
@@ -83,6 +109,7 @@ def main(stdscr):
                 inputUsr = inputUsr + chr(key)
 
 def start():
+    msgh.status(login=True)
     # Run the message receiving function in a separate thread
     receive_thread = threading.Thread(target=msgh.receive_message, daemon=True)
     receive_thread.start()
@@ -92,9 +119,9 @@ def start():
 
 if __name__ == "__main__":
     try:
-        username, color = curses.wrapper(login.main)
+        username, color = curses.wrapper(lio.main)
     except Exception as e:
-        exit()
+        sys.exit()
     inputUsr = ""
     start()
     
