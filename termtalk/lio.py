@@ -4,9 +4,10 @@ import curses
 from random import randint, uniform
 import exitHandler
 
-#lio = Log In Out
+Online = False
 
 def cleanup_and_exit():
+    print("\033[31m" + "You're using inappropriate way to exit." + "\033[0m" + "\n")
     Sexit()
 
 exitHandler.start(cleanup_and_exit)

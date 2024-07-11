@@ -1,23 +1,20 @@
-import sys
+from sys import exit as Sexit
 import curses
 from curses.textpad import rectangle
 
 import threading
 import messagehandler as msgh, lio, exitHandler
-# from . import messagehandler as msgh, login
 
 def handling_exit():
-    msgh.status(logout=True)
+    if lio.Online: msgh.status(logout=True)
     print("\033[31m" + "You're using inappropriate way to exit." + "\033[0m" + "\n")
     print("Follow me!\033[94m\nGithub: Dzadaafa\nInstagram: Dzadafa\033[0m\nTo get the new update about this project.")
-    sys.exit()
-
-exitHandler.start(handling_exit)
+    Sexit()
 
 colors = lio.colors
 
 def main(stdscr):
-    global inputUsr, username, colors
+    global inputUsr, color, username, colors
 
     curses.start_color()
 
@@ -35,6 +32,10 @@ def main(stdscr):
 
     # List to store the printed numbers
     lines = []
+
+    if username: 
+        exitHandler.start(handling_exit)
+        lio.Online = True
 
     while username: #while username exist
         messages = msgh.messages
@@ -81,7 +82,8 @@ def main(stdscr):
 
         #Box2
         stdscr.addstr(height - 4, 2, f" Active user: {online_user} ", curses.color_pair(4))
-        stdscr.addstr(height - 2, 2, f"-> {username}: ", curses.color_pair(color + 1))
+        stdscr.addstr(height - 2, 2, f"-> ", curses.color_pair(3))
+        stdscr.addstr(f"{username}: ", curses.color_pair(color + 1))
         stdscr.addstr(str(inputUsr))
 
         # Refresh the screen to see the changes
@@ -94,6 +96,7 @@ def main(stdscr):
         # If the user presses 'ESC', break the loop
         if key == 27:
             msgh.status(logout=True)
+            lio.Online = False
             lio.logout_screen(stdscr)
             break
 
@@ -108,20 +111,25 @@ def main(stdscr):
             if key in range(31, 127) and len(inputUsr) <= 30:
                 inputUsr = inputUsr + chr(key)
 
-def start():
+def open_room():
     msgh.status(login=True)
     # Run the message receiving function in a separate thread
     receive_thread = threading.Thread(target=msgh.receive_message, daemon=True)
     receive_thread.start()
-
     # Initialize curses
     curses.wrapper(main)
 
-if __name__ == "__main__":
+def start():
+    global username, color
     try:
         username, color = curses.wrapper(lio.main)
     except Exception as e:
-        sys.exit()
-    inputUsr = ""
-    start()
+        Sexit()
+    open_room()
     
+username:str
+color:int
+inputUsr = ""
+
+if __name__=="__main__":
+    start()
