@@ -4,10 +4,17 @@
 TermTalk stand for Terminal Talk is a Terminal-based chat app. With this, now you can perform chatting with random people on your terminal.
 Built fully in Python with Firebase as Database Storage (Temporary).
 
+## Contents
+-   [Features](#features)
+-   [Installation](#installation)
+-   [Usage](#usage)
+-   [Collaboration](#collaboration)
+-   [Social](#social)
+
 ## Features
 
 - Send and receive messages in real-time.
-- Public space to spend your time.
+- Public chat space.
 
 ## Installation
 
@@ -52,7 +59,6 @@ options:
 '''
   
 ```
-
 
 
 ## Collaboration

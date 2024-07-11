@@ -1,7 +1,6 @@
 from sys import exit as Sexit
 import curses
 from curses.textpad import rectangle
-
 import threading
 import messagehandler as msgh, lio, exitHandler
 
