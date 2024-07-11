@@ -28,38 +28,6 @@ After installed the package, you can just use it in Terminal
 ```
 termtalk
 ```
-If you facing an error while opening a new terminal. 
-Open new terminal manually and type this
-```
-termtalk -d
-```
-Maybe, you don't want to facing the same error again. You can just open two terminal 
-```python
-#first terminal
-
-termtalk -d
-```
-wait for the program to be running, and then
-
-```python
-#second terminal
-
-termtalk -s
-```
-To view all the options we got
-```py
-termtalk -h
-
-#result
-'''
-options:
-  -h, --help         show this help message and exit
-  -d, --destination  start the chat page individually
-  -s, --sender       start the chat sender individually
-'''
-  
-```
-
 
 ## Collaboration
 
