@@ -26,6 +26,11 @@ Install the package using pip:
 ```bash
 pip install termtalk
 ```
+or 
+```bash
+python -m pip install termtalk --user
+```
+
 ## Usage
 After installed the package, you can just use it in Terminal
 ```
