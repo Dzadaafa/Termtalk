@@ -16,6 +16,9 @@ Built fully in Python with Firebase as Database Storage (Temporary).
 - Send and receive messages in real-time.
 - Public chat space.
 
+## Demo
+![termtalk-demo-gif](https://github.com/user-attachments/assets/3287abe7-5ec2-4d17-8ecd-1c2aa73f5db7)
+
 ## Installation
 
 Install the package using pip:
